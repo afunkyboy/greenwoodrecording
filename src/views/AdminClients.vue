@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 
 const router = useRouter()
 const isLoading = ref(true)
-const clients = ref<any[]>([])
+const clients = ref([])
 const error = ref('')
 const searchQuery = ref('')
 
@@ -34,16 +34,16 @@ const fetchClients = async () => {
   }
 }
 
-const viewClient = (id: string) => {
+const viewClient = (id) => {
   router.push(`/admin/clients/${id}`)
 }
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString) => {
   if (!dateString) return 'N/A'
   return new Date(dateString).toLocaleDateString()
 }
 
-const getInitials = (name: string) => {
+const getInitials = (name) => {
   if (!name) return '?'
   return name
     .split(' ')

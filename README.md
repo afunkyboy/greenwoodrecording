@@ -1,6 +1,6 @@
 # Greenwood Recording Studio - Booking System
 
-A modern client acquisition and booking system for Greenwood Recording Studio, built with Vue 3, TypeScript, Vite, and Supabase.
+A modern client acquisition and booking system for Greenwood Recording Studio, built with Vue 3, JavaScript, Vite, and Supabase.
 
 ## Features
 
@@ -12,7 +12,7 @@ A modern client acquisition and booking system for Greenwood Recording Studio, b
 
 ## Tech Stack
 
-- **Frontend**: Vue 3, TypeScript, Vite, Tailwind CSS
+- **Frontend**: Vue 3, JavaScript, Vite, Tailwind CSS
 - **Backend**: Supabase (PostgreSQL, Auth, Realtime)
 - **Deployment**: Vercel/Netlify
 
@@ -60,7 +60,11 @@ Then, fill in the required values in your new `.env` file:
 - `npm run dev`: Starts the development server.
 - `npm run build`: Builds the application for production.
 - `npm run preview`: Previews the production build locally.
-- `npm run lint`: Lints the code to catch errors.
+
+Utility scripts (run with Node):
+
+- `node scripts/create-admin.js --email <email> --password <password>`: Create an admin user in Supabase (requires `SUPABASE_SERVICE_KEY` in `.env`).
+- `node scripts/seed-test-bookings.js <supabase-url> <supabase-anon-key>`: Seed some test bookings.
 
 ## Project Structure
 
@@ -71,7 +75,6 @@ Then, fill in the required values in your new `.env` file:
 |-- composables/    # Shared logic (e.g., useBookings)
 |-- lib/            # Supabase client configuration
 |-- router/         # Vue Router setup
-|-- types/          # TypeScript type definitions
 |-- views/          # Page-level components
 ```
 

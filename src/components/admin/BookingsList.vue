@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 // This component is no longer in use
 // Booking management has been moved to AdminDashboard.vue
 </script>

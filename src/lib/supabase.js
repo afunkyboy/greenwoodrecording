@@ -13,4 +13,4 @@ export const TABLES = {
   CLIENTS: 'clients',
   BOOKINGS: 'bookings',
   AVAILABILITY: 'availability',
-} as const
+}

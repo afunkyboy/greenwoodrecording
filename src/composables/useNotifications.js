@@ -1,17 +1,11 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 
-interface Notification {
-  type: 'success' | 'error' | 'info' | 'warning'
-  message: string
-  id: number
-}
-
 export function useNotifications() {
-  const notifications = ref<Notification[]>([])
+  const notifications = ref([])
   let nextId = 0
 
-  const addNotification = (type: Notification['type'], message: string, duration = 5000) => {
+  const addNotification = (type, message, duration = 5000) => {
     const id = nextId++
     const notification = { type, message, id }
     
@@ -26,7 +20,7 @@ export function useNotifications() {
     return id
   }
 
-  const removeNotification = (id: number) => {
+  const removeNotification = (id) => {
     const index = notifications.value.findIndex(n => n.id === id)
     if (index !== -1) {
       notifications.value.splice(index, 1)
@@ -38,7 +32,7 @@ export function useNotifications() {
   }
 
   // Send email notification using Supabase Edge Function
-  const sendEmailNotification = async (to: string, subject: string, html: string) => {
+  const sendEmailNotification = async (to, subject, html) => {
     try {
       const { data, error } = await supabase.functions.invoke('send-email', {
         body: JSON.stringify({ to, subject, html }),
@@ -52,7 +46,7 @@ export function useNotifications() {
   }
 
   // Send booking confirmation email
-  const sendBookingConfirmation = async (email: string, clientName: string, bookingDetails: any) => {
+  const sendBookingConfirmation = async (email, clientName, bookingDetails) => {
     const subject = `Booking Confirmation - ${bookingDetails.status}`
     
     let statusMessage = ''
@@ -88,7 +82,7 @@ export function useNotifications() {
   }
 
   // Test function - can be called from browser console
-  const testEmail = async (email: string = 'test@example.com') => {
+  const testEmail = async (email = 'test@example.com') => {
     try {
       const response = await sendEmailNotification(
         email,
@@ -107,7 +101,7 @@ export function useNotifications() {
 
   // Expose test function in development
   if (import.meta.env.DEV) {
-    // @ts-ignore - Expose for testing
+    // Expose for testing
     window.__greenwoodTestEmail = testEmail
   }
 

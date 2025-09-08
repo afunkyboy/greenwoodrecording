@@ -1,6 +1,10 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
-import { useBookings, type BookingRequest } from '@/composables/useBookings'
+import { useBookings } from '@/composables/useBookings'
+
+console.log('useBookings import:', useBookings)
+
+console.log('BookingForm component is mounting...')
 
 const { 
   loading, 
@@ -8,7 +12,7 @@ const {
   getAvailableDates
 } = useBookings()
 
-const form = ref<BookingRequest>({
+const form = ref({
   client_name: '',
   email: '',
   phone: '',
@@ -16,12 +20,12 @@ const form = ref<BookingRequest>({
   preferred_dates: [],
 })
 
-const selectedDates = ref<Date[]>([])
+const selectedDates = ref([])
 const currentMonth = ref(new Date())
 const isSelectingRange = ref(false)
-const rangeStart = ref<Date | null>(null)
-const rangeEnd = ref<Date | null>(null)
-const errors = ref<Record<string, string>>({})
+const rangeStart = ref(null)
+const rangeEnd = ref(null)
+const errors = ref({})
 const isSubmitting = ref(false)
 
 // Form validation
@@ -48,12 +52,12 @@ const formatPhoneNumber = () => {
   form.value.phone = formatted
 }
 
-const validatePhoneNumber = (phone: string): boolean => {
+const validatePhoneNumber = (phone) => {
   const phoneRegex = /^\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
   return phoneRegex.test(phone);
 }
 
-const validateForm = (): boolean => {
+const validateForm = () => {
   errors.value = {}
   
   if (!form.value.client_name.trim()) {
@@ -85,13 +89,13 @@ onMounted(async () => {
   await getAvailableDates()
 })
 
-const handleDateHover = (date: Date | null) => {
+const handleDateHover = (date) => {
   if (isSelectingRange.value && rangeStart.value && date) {
     rangeEnd.value = date
   }
 }
 
-const isInRange = (date: Date | null): boolean => {
+const isInRange = (date) => {
   if (!rangeStart.value || !rangeEnd.value || !date) return false
   
   const start = rangeStart.value < rangeEnd.value ? rangeStart.value : rangeEnd.value
@@ -100,7 +104,7 @@ const isInRange = (date: Date | null): boolean => {
   return date >= start && date <= end
 }
 
-const handleDateClick = (date: Date | null) => {
+const handleDateClick = (date) => {
   if (!date) return
   
   if (isSelectingRange.value) {
@@ -141,19 +145,19 @@ const handleDateClick = (date: Date | null) => {
   form.value.preferred_dates = selectedDates.value.map(d => d.toISOString().split('T')[0])
 }
 
-const isDateSelected = (date: Date | null): boolean => {
+const isDateSelected = (date) => {
   if (!date) return false
   return selectedDates.value.some(d => d.toDateString() === date.toDateString())
 }
 
-const isPastDate = (date: Date | null): boolean => {
+const isPastDate = (date) => {
   if (!date) return false
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   return date < today
 }
 
-const removeDate = (dateToRemove: Date) => {
+const removeDate = (dateToRemove) => {
   const index = selectedDates.value.findIndex(d => d.toDateString() === dateToRemove.toDateString())
   if (index >= 0) {
     selectedDates.value.splice(index, 1)
@@ -161,17 +165,17 @@ const removeDate = (dateToRemove: Date) => {
   }
 }
 
-const getDaysInMonth = (year: number, month: number) => {
+const getDaysInMonth = (year, month) => {
   return new Date(year, month + 1, 0).getDate()
 }
 
-const getMonthDays = (date: Date): (Date | null)[] => {
+const getMonthDays = (date) => {
   const year = date.getFullYear()
   const month = date.getMonth()
   const firstDay = new Date(year, month, 1).getDay()
   const daysInMonth = getDaysInMonth(year, month)
   
-  const days: (Date | null)[] = []
+  const days = []
   
   // Add empty cells for days before the first of the month
   for (let i = 0; i < firstDay; i++) {
@@ -202,11 +206,11 @@ const prevMonth = () => {
   )
 }
 
-const monthName = (date: Date) => {
+const monthName = (date) => {
   return date.toLocaleString('default', { month: 'long', year: 'numeric' })
 }
 
-const isToday = (date: Date | null): boolean => {
+const isToday = (date) => {
   if (!date) return false
   const today = new Date()
   return date.getDate() === today.getDate() &&
@@ -214,7 +218,7 @@ const isToday = (date: Date | null): boolean => {
          date.getFullYear() === today.getFullYear()
 }
 
-const formatDate = (date: Date) => {
+const formatDate = (date) => {
   return date.toLocaleDateString('en-US', {
     weekday: 'short',
     month: 'short',
@@ -228,7 +232,22 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   
   try {
-    await submitBooking(form.value)
+    // Ensure we have the latest selected dates
+    form.value.preferred_dates = selectedDates.value
+      .sort((a, b) => a - b) // Sort dates chronologically
+      .map(date => date.toISOString().split('T')[0]) // Format as YYYY-MM-DD
+    
+    console.log('Submitting booking:', form.value) // Debug log
+    
+    const result = await submitBooking({
+      client_name: form.value.client_name.trim(),
+      email: form.value.email.trim(),
+      phone: form.value.phone.trim(),
+      project_details: form.value.project_details.trim(),
+      preferred_dates: form.value.preferred_dates
+    })
+    
+    if (result.error) throw result.error
     
     // Reset form on success
     form.value = {
@@ -244,7 +263,7 @@ const handleSubmit = async () => {
     alert('Your booking request has been submitted successfully!')
   } catch (error) {
     console.error('Error submitting booking:', error)
-    alert('There was an error submitting your booking. Please try again.')
+    alert(error.message || 'There was an error submitting your booking. Please try again.')
   } finally {
     isSubmitting.value = false
   }

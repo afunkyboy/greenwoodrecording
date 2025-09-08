@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
 import { useSupabase } from '@/composables/useSupabase'
@@ -71,5 +71,11 @@ onMounted(async () => {
 <style>
 .router-link-active {
   @apply font-semibold;
+}
+
+/* Main content styles */
+main {
+  min-height: 50vh;
+  background-color: #f8f9fa;
 }
 </style>

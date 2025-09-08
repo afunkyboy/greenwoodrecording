@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 
 const router = useRouter()
 const isLoading = ref(true)
-const bookings = ref<any[]>([])
+const bookings = ref([])
 const error = ref('')
 
 const fetchBookings = async () => {
@@ -30,22 +30,22 @@ const fetchBookings = async () => {
   }
 }
 
-const viewBooking = (id: string) => {
+const viewBooking = (id) => {
   router.push(`/admin/bookings/${id}`)
 }
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
-const getStatusBadgeClass = (status: string) => {
+const getStatusBadgeClass = (status) => {
   const classes = {
     pending: 'bg-yellow-100 text-yellow-800',
     confirmed: 'bg-green-100 text-green-800',
     cancelled: 'bg-red-100 text-red-800',
     completed: 'bg-blue-100 text-blue-800'
   }
-  return classes[status as keyof typeof classes] || 'bg-gray-100 text-gray-800'
+  return classes[status] || 'bg-gray-100 text-gray-800'
 }
 
 onMounted(() => {

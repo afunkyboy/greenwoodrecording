@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -6,7 +6,7 @@ const router = useRouter()
 const route = useRoute()
 
 const isCheckingAuth = ref(true)
-const authError = ref<string | null>(null)
+const authError = ref(null)
 
 // Check if user is authenticated
 const isAuthenticated = () => {

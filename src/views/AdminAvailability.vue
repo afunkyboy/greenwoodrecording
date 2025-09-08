@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import AvailabilityManager from '@/components/admin/AvailabilityManager.vue'
 </script>
 

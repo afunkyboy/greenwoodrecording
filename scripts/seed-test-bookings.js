@@ -8,7 +8,7 @@ const supabaseUrl = args[0]
 const supabaseKey = args[1]
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Usage: npx ts-node seed-test-bookings.ts <supabase-url> <supabase-anon-key>')
+  console.error('Usage: node seed-test-bookings.js <supabase-url> <supabase-anon-key>')
   console.error('You can find these values in your Supabase project settings > API')
   process.exit(1)
 }
@@ -61,7 +61,7 @@ async function createTestBookings() {
   }
 }
 
-async function createBookingsForClient(clientId: string) {
+async function createBookingsForClient(clientId) {
   const today = new Date()
   
   // Create bookings for next 7 days

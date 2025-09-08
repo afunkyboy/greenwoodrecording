@@ -32,7 +32,7 @@ app.config.globalProperties.$supabase = supabaseClient
 app.mount('#app')
 
 // Handle auth state changes
-supabaseClient.supabase.auth.onAuthStateChange((event, session) => {
+supabaseClient.supabase.auth.onAuthStateChange((event, _session) => {
   if (event === 'SIGNED_OUT' && router.currentRoute.value.meta.requiresAuth) {
     router.push('/login')
   }

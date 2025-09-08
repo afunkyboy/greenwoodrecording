@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import CalendarView from '@/components/admin/CalendarView.vue'
 </script>
 

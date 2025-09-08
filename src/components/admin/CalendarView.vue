@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, computed, watch } from 'vue'
 import { useSupabase } from '@/composables/useSupabase'
 import { useBookings } from '@/composables/useBookings'
@@ -12,18 +12,17 @@ import {
   isWeekend
 } from 'date-fns'
 import { useToast } from 'vue-toastification'
-import type { Booking } from '@/types/booking'
 
 // Calendar state
 const currentDate = ref(new Date())
-const selectedDate = ref<Date | null>(null)
+const selectedDate = ref(null)
 const view = ref('month')
 const availableViews = ['month', 'week', 'day']
-const dragOverDate = ref<Date | null>(null)
+const dragOverDate = ref(null)
 const isDragging = ref(false)
 
 // Helper function to safely access date properties
-const getDateValue = (date: Date) => ({
+const getDateValue = (date) => ({
   year: date.getFullYear(),
   month: date.getMonth(),
   day: date.getDate(),
@@ -31,7 +30,7 @@ const getDateValue = (date: Date) => ({
 })
 
 // Computed properties
-const daysInMonth = computed<Date[]>(() => {
+const daysInMonth = computed(() => {
   const { year, month } = getDateValue(currentDate.value)
   const days = getDaysInMonth(new Date(year, month))
   
@@ -39,7 +38,7 @@ const daysInMonth = computed<Date[]>(() => {
 })
 
 // Calculate empty cells for the first week
-const emptyDays = computed<number>(() => {
+const emptyDays = computed(() => {
   const { year, month } = getDateValue(currentDate.value)
   return new Date(year, month, 1).getDay()
 })
@@ -48,13 +47,13 @@ const emptyDays = computed<number>(() => {
 const currentMonthName = computed(() => format(currentDate.value, 'MMMM yyyy'))
 
 // Get the first day of the current month view
-const firstDayOfMonth = computed<Date>(() => {
+const firstDayOfMonth = computed(() => {
   const date = new Date(currentDate.value)
   return new Date(date.getFullYear(), date.getMonth(), 1)
 })
 
 // Get the last day of the current month view
-const lastDayOfMonth = computed<Date>(() => {
+const lastDayOfMonth = computed(() => {
   const date = new Date(currentDate.value)
   return new Date(date.getFullYear(), date.getMonth() + 1, 0)
 })
@@ -63,23 +62,15 @@ const lastDayOfMonth = computed<Date>(() => {
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 // Booking data
-interface ExtendedBooking extends Booking {
-  client_name?: string;
-  client_email?: string;
-  client_phone?: string;
-  display_date?: string;
-  clients?: any[];
-}
-
-const bookings = ref<ExtendedBooking[]>([])
+const bookings = ref([])
 const isLoading = ref(true)
 const error = ref('')
-const selectedBooking = ref<ExtendedBooking | null>(null)
+const selectedBooking = ref(null)
 const showBookingModal = ref(false)
 const isEditing = ref(false)
 
 // UI State
-const draggedBooking = ref<ExtendedBooking | null>(null)
+const draggedBooking = ref(null)
 
 // Calendar navigation
 const previousMonth = () => {
@@ -101,20 +92,20 @@ const nextMonth = () => {
 }
 
 // Format time for display
-const formatTime = (date: string | Date) => {
+const formatTime = (date) => {
   if (!date) return ''
   return format(new Date(date), 'h:mm a')
 }
 
 // Check if a day has any bookings
-const hasBookings = (day: Date) => {
+const hasBookings = (day) => {
   return bookings.value.some(booking => {
     const bookingDate = booking.confirmed_date || booking.preferred_dates?.[0]
     return bookingDate && isSameDay(new Date(bookingDate), day)
   })
 }
 
-function getBookingsForDay(day: Date): ExtendedBooking[] {
+function getBookingsForDay(day) {
   if (!day) return []
   
   return bookings.value.filter(booking => {
@@ -153,7 +144,7 @@ const formattedBookings = computed(() => {
 })
 
 // Methods
-const getStatusColor = (status: string = '') => {
+const getStatusColor = (status) => {
   const statusLower = status?.toLowerCase() || ''
   switch (statusLower) {
     case 'confirmed': return 'green'
@@ -165,12 +156,12 @@ const getStatusColor = (status: string = '') => {
   }
 }
 
-const handleDayClick = (day: { date: Date }) => {
+const handleDayClick = (day) => {
   selectedDate.value = day.date
   view.value = 'day'
 }
 
-const handleEventClick = (event: { event: { customData: Booking } }) => {
+const handleEventClick = (event) => {
   selectedBooking.value = event.event.customData
   showBookingModal.value = true
 }
@@ -231,10 +222,10 @@ async function fetchBookings() {
           booking_date: bookingDateStr,
           start_time: bookingDateStr,
           end_time: bookingDateObj ? new Date(bookingDateObj.getTime() + 60 * 60 * 1000).toISOString() : null
-        } as unknown as ExtendedBooking
+        }
       })
     }
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error fetching bookings:', err)
     error.value = 'Failed to load bookings. Please try again.'
   } finally {
@@ -247,7 +238,7 @@ async function fetchBookings() {
 // Removed unused changeMonth function as we have previousMonth and nextMonth
 
 // Drag and drop handlers
-function onDragStart(booking: Booking) {
+function onDragStart(booking) {
   draggedBooking.value = booking
   isDragging.value = true
   document.body.style.cursor = 'grabbing'
@@ -259,7 +250,7 @@ function onDragEnd() {
   document.body.style.cursor = ''
 }
 
-function onDragOver(event: DragEvent, day: Date) {
+function onDragOver(event, day) {
   event.preventDefault()
   if (isPast(day) && !isToday(day)) return
   dragOverDate.value = day
@@ -269,7 +260,7 @@ function onDragLeave() {
   dragOverDate.value = null
 }
 
-async function onDrop(event: DragEvent, day: Date) {
+async function onDrop(event, day) {
   event.preventDefault()
   
   if (!draggedBooking.value || (isPast(day) && !isToday(day))) {
@@ -280,7 +271,7 @@ async function onDrop(event: DragEvent, day: Date) {
   try {
     isLoading.value = true
     
-    const oldDate = new Date(draggedBooking.value.confirmed_date!)
+    const oldDate = new Date(draggedBooking.value.confirmed_date || day)
     const newDate = new Date(day)
     newDate.setHours(oldDate.getHours(), oldDate.getMinutes())
     

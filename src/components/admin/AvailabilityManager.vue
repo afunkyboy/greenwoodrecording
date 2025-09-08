@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useSupabase } from '@/composables/useSupabase'
 import { format, parseISO, addDays } from 'date-fns'
@@ -17,15 +17,7 @@ const isRecurring = ref(false)
 const recurringDays = ref(7)
 
 // Available slots
-const availabilitySlots = ref<Array<{
-  id: string
-  date: string
-  start_time: string
-  end_time: string
-  max_bookings: number
-  current_bookings: number
-  is_available: boolean
-}>>([])
+const availabilitySlots = ref([])
 
 // Fetch availability slots
 const fetchAvailability = async () => {
@@ -63,14 +55,7 @@ const addAvailability = async () => {
     success.value = ''
     
     const baseDate = new Date(date.value)
-    const slotsToAdd: Array<{
-      date: string
-      start_time: string
-      end_time: string
-      max_bookings: number
-      current_bookings: number
-      is_available: boolean
-    }> = []
+    const slotsToAdd = []
     
     // Create slots for each day in the recurring period if enabled
     const daysToAdd = isRecurring.value ? recurringDays.value : 1
@@ -122,7 +107,7 @@ const addAvailability = async () => {
 }
 
 // Toggle availability of a slot
-const toggleAvailability = async (slot: any) => {
+const toggleAvailability = async (slot) => {
   try {
     loading.value = true
     error.value = ''
@@ -144,7 +129,7 @@ const toggleAvailability = async (slot: any) => {
 }
 
 // Delete a slot
-const deleteSlot = async (id: string) => {
+const deleteSlot = async (id) => {
   if (!confirm('Are you sure you want to delete this availability slot?')) return
   
   try {
@@ -168,12 +153,12 @@ const deleteSlot = async (id: string) => {
 }
 
 // Format date for display
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr) => {
   return format(parseISO(dateStr), 'EEE, MMM d, yyyy')
 }
 
 // Format time for display
-const formatTime = (timeStr: string) => {
+const formatTime = (timeStr) => {
   return format(parseISO(`2000-01-01T${timeStr}`), 'h:mm a')
 }
 
